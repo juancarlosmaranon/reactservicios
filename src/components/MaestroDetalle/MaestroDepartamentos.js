@@ -1,15 +1,15 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import axios from 'axios';
-import Global from '../Global';
+import Global from '../../Global';
+import MaestroEmpleados from './MaestroEmpleados';
 
-export default class DepartamentosEmpleados extends Component {
+export default class MaestroDepartamentos extends Component {
     urlDept = Global.urlDept;
     selector = React.createRef();
     state={
         departamentos:[], 
         statusDept: false,
-        statusEmpl: false,
-        empleados:[]
+        idDepartamento :0
     }
     loadDept=()=>{
         axios.get(this.urlDept).then(response =>{
@@ -23,14 +23,10 @@ export default class DepartamentosEmpleados extends Component {
     }
     filtrarDept=(e)=>{
         e.preventDefault();
-        var urlEmpl = "https://apiempleadosfullstack.azurewebsites.net/api/Empleados/EmpleadosDepartamento/"+this.selector.current.value;
-        axios.get(urlEmpl).then(response =>{
-            this.setState({
-                empleados :response.data,
-                statusEmpl: true 
-            })
+        var idDept = this.selector.current.value;
+        this.setState({
+            idDepartamento : idDept
         })
-        
     }
     componentDidMount = () => {
         this.loadDept();    
@@ -39,7 +35,7 @@ export default class DepartamentosEmpleados extends Component {
         return (
             <div>
                 <h1>Departamentos Empleados</h1>
-                <select ref={this.selector} onClick={this.filtrarDept}>
+                <select ref={this.selector} onChange={this.filtrarDept}>
                     {
                         this.state.statusDept == true &&
                         (this.state.departamentos.map((dept,index)=>{
@@ -49,18 +45,11 @@ export default class DepartamentosEmpleados extends Component {
                         }))
                     }
                 </select>
-                <ul>
+                <h2 style={{color:"red"}}>Departamento seleccionado:</h2>
                     {
-                        this.state.statusEmpl == true &&
-                        (this.state.empleados.map((empl,index)=>{
-                            return(
-                                <ul>
-                                    <li value={empl.Numero}>{empl.apellido}</li>
-                                </ul>
-                            )
-                        }))
+                        (this.state.idDepartamento != 0) &&
+                        (<MaestroEmpleados iddepartamento={this.state.idDepartamento}/>)
                     }
-                </ul>
             </div>
         )
     }
